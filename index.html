@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ЭКСКРЕМЕНТ СИТИ — 20.04.26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #060606;
+    --dark: #0e0e0e;
+    --red: #cc1111;
+    --orange: #ff4500;
+    --cream: #d8cfc0;
+    --dim: #6b6058;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'VT323', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: var(--mono);
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* SCANLINES */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* GLITCH KEYFRAMES */
+  @keyframes glitch {
+    0%, 100% { clip-path: none; transform: none; }
+    20% { clip-path: inset(30% 0 50% 0); transform: translate(-3px, 0); }
+    40% { clip-path: inset(70% 0 10% 0); transform: translate(3px, 0); }
+    60% { clip-path: none; transform: none; }
+    80% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); color: var(--orange); }
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.6; }
+    94% { opacity: 1; }
+    96% { opacity: 0.3; }
+    97% { opacity: 1; }
+  }
+
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0px var(--red); }
+    50% { box-shadow: 0 0 20px var(--red), 0 0 40px rgba(200,0,0,0.3); }
+  }
+
+  @keyframes countdown-tick {
+    0% { color: var(--cream); }
+    50% { color: var(--red); }
+    100% { color: var(--cream); }
+  }
+
+  @keyframes bar-fill {
+    from { width: 0%; }
+    to { width: var(--target-width, 100%); }
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* HEADER ZONE */
+  .header-zone {
+    padding: 40px 0 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .header-zone .warning-strip {
+    font-family: var(--display);
+    font-size: 13px;
+    letter-spacing: 6px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    animation: flicker 8s infinite;
+  }
+
+  /* COVER */
+  .cover-wrap {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto 0;
+  }
+
+  .cover-img {
+    width: min(480px, 90vw);
+    height: min(480px, 90vw);
+    object-fit: cover;
+    display: block;
+    filter: contrast(1.1) saturate(0.85);
+    border: 1px solid #1a1a1a;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-img.glitching {
+    animation: glitch 0.4s steps(2) infinite;
+  }
+
+  .cover-corner {
+    position: absolute;
+    font-family: var(--display);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    z-index: 2;
+  }
+  .cover-corner.tl { top: 8px; left: 8px; }
+  .cover-corner.tr { top: 8px; right: 8px; }
+  .cover-corner.bl { bottom: 8px; left: 8px; }
+  .cover-corner.br { bottom: 8px; right: 8px; }
+
+  /* TITLE */
+  .album-title {
+    font-family: var(--display);
+    font-size: clamp(42px, 9vw, 82px);
+    letter-spacing: 8px;
+    color: var(--cream);
+    margin-top: 30px;
+    line-height: 1;
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  .album-title::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    color: var(--red);
+    clip-path: inset(45% 0 45% 0);
+    transform: translate(3px, 0);
+    opacity: 0.7;
+    animation: glitch 7s steps(2) infinite;
+  }
+
+  .artists-line {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 5px;
+    color: var(--dim);
+    text-transform: uppercase;
+    margin-top: 12px;
+    margin-bottom: 8px;
+  }
+
+  /* COUNTDOWN */
+  .drop-block {
+    margin: 32px auto;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .drop-label {
+    font-family: var(--display);
+    font-size: 12px;
+    letter-spacing: 6px;
+    color: var(--dim);
+    text-transform: uppercase;
+  }
+
+  .countdown-wrap {
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+  }
+
+  .countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .countdown-num {
+    font-family: var(--display);
+    font-size: clamp(36px, 8vw, 64px);
+    color: var(--cream);
+    line-height: 1;
+    min-width: 2ch;
+    text-align: center;
+    animation: countdown-tick 1s step-end infinite;
+  }
+
+  .countdown-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .countdown-sep {
+    font-family: var(--display);
+    font-size: 48px;
+    color: var(--red);
+    line-height: 1;
+    margin-bottom: 16px;
+    animation: flicker 2s infinite;
+  }
+
+  .dropped-msg {
+    font-family: var(--display);
+    font-size: 48px;
+    color: var(--red);
+    letter-spacing: 6px;
+    animation: pulse-red 1.5s infinite;
+  }
+
+  /* DIVIDER */
+  .divider {
+    width: 100%;
+    max-width: 560px;
+    margin: 20px auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity: 0.4;
+  }
+
+  /* TRACKLIST SECTION */
+  .tracklist-section {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  .section-header {
+    font-family: var(--display);
+    font-size: 11px;
+    letter-spacing: 7px;
+    color: var(--dim);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* TRACK ROW */
+  .track {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    align-items: start;
+    padding: 10px 0;
+    border-bottom: 1px solid #141414;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s;
+    user-select: none;
+  }
+
+  .track:hover {
+    background: rgba(200, 17, 17, 0.04);
+  }
+
+  .track:hover .track-num {
+    color: var(--red);
+  }
+
+  .track.active {
+    background: rgba(200, 17, 17, 0.07);
+  }
+
+  .track.active .track-num {
+    color: var(--red);
+    animation: flicker 1.5s infinite;
+  }
+
+  .track-num {
+    font-family: var(--display);
+    font-size: 20px;
+    color: var(--dim);
+    padding-top: 1px;
+    text-align: right;
+    transition: color 0.15s;
+  }
+
+  .track-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .track-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--cream);
+    text-transform: lowercase;
+    line-height: 1.4;
+    letter-spacing: 0.5px;
+  }
+
+  .track.active .track-title {
+    color: #fff;
+  }
+
+  .track-prod {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+  }
+
+  /* PROGRESS BAR */
+  .track-progress-wrap {
+    grid-column: 1 / -1;
+    padding-left: 40px;
+    display: none;
+  }
+
+  .track.active .track-progress-wrap {
+    display: block;
+  }
+
+  .track-progress-bar {
+    height: 1px;
+    background: #1a1a1a;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .track-progress-fill {
+    height: 100%;
+    background: var(--red);
+    width: 0%;
+    transition: width 0.5s linear;
+  }
+
+  .track-time {
+    font-family: var(--display);
+    font-size: 11px;
+    color: var(--dim);
+    margin-top: 4px;
+    letter-spacing: 2px;
+  }
+
+  /* PLAY INDICATOR */
+  .play-indicator {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--display);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .track:hover .play-indicator {
+    opacity: 1;
+  }
+
+  .track.active .play-indicator {
+    opacity: 1;
+    color: var(--red);
+    animation: flicker 1s infinite;
+  }
+
+  /* BOTTOM SECTION */
+  .bottom-section {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 10px 20px 60px;
+    text-align: center;
+  }
+
+  .links-row {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tg-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    border: 1px solid #1e1e1e;
+    padding: 10px 18px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+
+  .tg-link:hover {
+    color: var(--cream);
+    border-color: var(--red);
+    background: rgba(200,17,17,0.05);
+  }
+
+  .tg-link::before {
+    content: '▶';
+    font-size: 9px;
+    color: var(--red);
+  }
+
+  .footer-line {
+    margin-top: 40px;
+    font-family: var(--display);
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: #2a2a2a;
+    text-transform: uppercase;
+  }
+
+  /* AUDIO NOTICE */
+  .no-audio-note {
+    display: none;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    margin-top: 6px;
+    opacity: 0.6;
+  }
+
+  /* SNIPPET PLAYER LABEL */
+  .snippet-label {
+    font-family: var(--display);
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 12px;
+    animation: flicker 3s infinite;
+    display: none;
+  }
+
+  .snippet-label.visible { display: block; }
+
+  @media (max-width: 500px) {
+    .links-row { flex-direction: column; align-items: center; }
+    .tg-link { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header-zone">
+  <div class="warning-strip">ЭКСКРЕМЕНЦИЯ!!!</div>
+
+  <div class="cover-wrap">
+    <img class="cover-img" id="coverImg" src="cover.jpg" alt="ЭКСКРЕМЕНТ СИТИ"
+         onerror="this.style.display='none'; document.getElementById('coverFallback').style.display='flex';">
+    <div id="coverFallback" style="display:none;width:min(480px,90vw);height:min(480px,90vw);background:#0e0e0e;border:1px solid #1a1a1a;align-items:center;justify-content:center;font-family:var(--display);font-size:48px;color:#1a1a1a;letter-spacing:4px;">COVER</div>
+    <span class="cover-corner tl">ЭКСК</span>
+    <span class="cover-corner tr">CITY</span>
+    <span class="cover-corner bl">2026</span>
+    <span class="cover-corner br">LP-01</span>
+  </div>
+
+  <h1 class="album-title" data-text="ЭКСКРЕМЕНТ СИТИ">ЭКСКРЕМЕНТ СИТИ</h1>
+  <div class="artists-line">temaprikolov &amp; MC ZLO</div>
+
+  <div class="drop-block">
+    <div class="drop-label">ДРОП ЧЕРЕЗ</div>
+    <div id="countdown" class="countdown-wrap">
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-d">00</span>
+        <span class="countdown-label">дней</span>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-h">00</span>
+        <span class="countdown-label">часов</span>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-m">00</span>
+        <span class="countdown-label">минут</span>
+      </div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cd-s">00</span>
+        <span class="countdown-label">секунд</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="tracklist-section">
+  <div class="section-header">— треклист —</div>
+
+  <div class="snippet-label" id="snippetLabel">[ ЭТ СНИППЕТ ]</div>
+
+  <div id="trackList"></div>
+</div>
+
+<div class="divider"></div>
+
+<div class="bottom-section">
+  <div class="section-header">— вся инфа тут —</div>
+  <div class="links-row">
+    <a class="tg-link" href="https://t.me/temaprikolov2" target="_blank">temaprikolov</a>
+    <a class="tg-link" href="https://t.me/mczloO" target="_blank">MC ZLO</a>
+  </div>
+  <div class="footer-line">ЭКСКРЕМЕНТ СИТИ © 2026 / temaprikolov &amp; MC ZLO</div>
+</div>
+
+<audio id="player" preload="none"></audio>
+
+<script>
+const TRACKS = [
+  { title: "определение в блатные", feat: "ft. WaWit", prod: "prod. Михаил Круг",       file: "snippets/01.mp3" },
+  { title: "пила 11",               feat: "",          prod: "prod. John Kramer",         file: "snippets/02.mp3" },
+  { title: "каловые мальдивы",      feat: "ft. deyezaxo", prod: "prod. трилпил",         file: "snippets/03.mp3" },
+  { title: "тимофей кулимов",       feat: "",          prod: "prod. DJ KOBILJON",         file: "snippets/04.mp3" },
+  { title: "СКИТ by ИЛЬНАЗ ГАЛЯЛИЕВ", feat: "",        prod: "",                          file: "snippets/05.mp3" },
+  { title: "в любой день недели",   feat: "",          prod: "prod. brosxzmm + beatrat556", file: "snippets/06.mp3" },
+  { title: "каловая фантазия",      feat: "ft. королевский 17 настоящий", prod: "prod. R2R", file: "snippets/07.mp3" },
+  { title: "ЧЕ ЗА СУЕТА? 😈🥀",    feat: "ft. tёmä",  prod: "prod. SUETOLOG",            file: "snippets/08.mp3" },
+  { title: "фетишисткий трек в сторону маши и медведя", feat: "ft. 27theory", prod: "prod. Jeffrey Epstein", file: "snippets/09.mp3" },
+  { title: "МАРИАННА КИС",          feat: "",          prod: "prod. Ilya Meddison",       file: "snippets/10.mp3" },
+];
+
+const SNIPPET_DURATION = 30;
+const player = document.getElementById('player');
+const snippetLabel = document.getElementById('snippetLabel');
+let currentIdx = -1;
+let progressInterval = null;
+
+function buildList() {
+  const container = document.getElementById('trackList');
+  TRACKS.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'track';
+    row.id = `track-${i}`;
+
+    const titleLine = [t.title, t.feat].filter(Boolean).join(' ');
+    const prodLine = t.prod;
+
+    row.innerHTML = `
+      <div class="track-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="track-info">
+        <div class="track-title">${titleLine}</div>
+        ${prodLine ? `<div class="track-prod">${prodLine}</div>` : ''}
+      </div>
+      <div class="track-progress-wrap">
+        <div class="track-progress-bar"><div class="track-progress-fill" id="fill-${i}"></div></div>
+        <div class="track-time" id="time-${i}">0:00 / 0:30</div>
+      </div>
+      <span class="play-indicator" id="pi-${i}">▶ PLAY</span>
+    `;
+
+    row.addEventListener('click', () => toggleTrack(i));
+    container.appendChild(row);
+  });
+}
+
+function toggleTrack(idx) {
+  if (currentIdx === idx) {
+    stopAll();
+    return;
+  }
+  stopAll();
+  playTrack(idx);
+}
+
+function playTrack(idx) {
+  currentIdx = idx;
+  const row = document.getElementById(`track-${idx}`);
+  row.classList.add('active');
+  document.getElementById('coverImg').classList.add('glitching');
+  snippetLabel.classList.add('visible');
+
+  const pi = document.getElementById(`pi-${idx}`);
+  if (pi) pi.textContent = '■ STOP';
+
+  player.src = TRACKS[idx].file;
+  player.currentTime = 0;
+
+  const startPlay = () => {
+    player.play().catch(() => {});
+    startProgress(idx);
+  };
+
+  player.oncanplay = startPlay;
+  player.onerror = () => {
+    // No audio file — still show visual feedback
+    startProgress(idx);
+  };
+
+  player.load();
+
+  // Hard cutoff at 30s
+  player.ontimeupdate = () => {
+    if (player.currentTime >= SNIPPET_DURATION) {
+      stopAll();
+    }
+  };
+}
+
+function startProgress(idx) {
+  clearInterval(progressInterval);
+  const fill = document.getElementById(`fill-${idx}`);
+  const time = document.getElementById(`time-${idx}`);
+  const start = Date.now();
+  const dur = SNIPPET_DURATION * 1000;
+
+  progressInterval = setInterval(() => {
+    const elapsed = Math.min(Date.now() - start, dur);
+    const pct = (elapsed / dur) * 100;
+    if (fill) fill.style.width = pct + '%';
+    const secs = Math.floor(elapsed / 1000);
+    if (time) time.textContent = `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')} / 0:30`;
+    if (elapsed >= dur) {
+      clearInterval(progressInterval);
+      stopAll();
+    }
+  }, 100);
+}
+
+function stopAll() {
+  if (currentIdx >= 0) {
+    const row = document.getElementById(`track-${currentIdx}`);
+    if (row) row.classList.remove('active');
+    const pi = document.getElementById(`pi-${currentIdx}`);
+    if (pi) pi.textContent = '▶ PLAY';
+    const fill = document.getElementById(`fill-${currentIdx}`);
+    if (fill) fill.style.width = '0%';
+  }
+  clearInterval(progressInterval);
+  player.pause();
+  player.src = '';
+  currentIdx = -1;
+  document.getElementById('coverImg').classList.remove('glitching');
+  snippetLabel.classList.remove('visible');
+}
+
+// COUNTDOWN
+const DROP_DATE = new Date('2026-04-20T00:00:00');
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = DROP_DATE - now;
+
+  if (diff <= 0) {
+    document.getElementById('countdown').innerHTML = '<div class="dropped-msg">УЖЕ ВЫШЕЛ</div>';
+    return;
+  }
+
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('cd-d').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+}
+
+buildList();
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>

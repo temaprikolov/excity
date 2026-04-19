@@ -29,6 +29,11 @@
     font-family: var(--mono);
     overflow-x: hidden;
     cursor: crosshair;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   /* NOISE OVERLAY */
@@ -87,19 +92,20 @@
     100% { color: var(--cream); }
   }
 
-  /* SPECIAL SHIT ANIMATION */
-  @keyframes float-shit {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+  @keyframes btn-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(204, 17, 17, 0.7); }
+    70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(204, 17, 17, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(204, 17, 17, 0); }
   }
 
-  /* HEADER ZONE */
-  .header-zone {
-    padding: 40px 0 0;
+  /* MAIN CONTAINER */
+  .container {
+    max-width: 640px;
+    width: 100%;
+    padding: 40px 20px;
     text-align: center;
     position: relative;
+    z-index: 1;
   }
 
   .warning-strip {
@@ -125,21 +131,22 @@
   .cover-wrap {
     position: relative;
     display: inline-block;
-    margin: 0 auto 0;
+    margin: 0 auto;
   }
 
   .cover-img {
-    width: min(480px, 90vw);
-    height: min(480px, 90vw);
+    width: min(400px, 80vw);
+    height: min(400px, 80vw);
     object-fit: cover;
     display: block;
     filter: contrast(1.1) saturate(0.85) sepia(0.1);
     border: 1px solid #1a1a1a;
     position: relative;
     z-index: 1;
+    margin: 0 auto;
   }
 
-  .cover-img.glitching {
+  .cover-img:hover {
     animation: glitch 0.4s steps(2) infinite;
   }
 
@@ -191,8 +198,8 @@
 
   /* COUNTDOWN */
   .drop-block {
-    margin: 32px auto;
-    display: inline-flex;
+    margin: 40px auto;
+    display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
@@ -210,6 +217,8 @@
     display: flex;
     gap: 4px;
     align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .countdown-unit {
@@ -248,7 +257,7 @@
 
   .dropped-msg {
     font-family: var(--display);
-    font-size: 48px;
+    font-size: 42px;
     color: var(--red);
     letter-spacing: 6px;
     animation: pulse-red 1.5s infinite;
@@ -256,170 +265,86 @@
 
   .dropped-msg::before {
     content: "💩 ";
-    font-size: 48px;
+    font-size: 42px;
   }
   .dropped-msg::after {
     content: " 💩";
-    font-size: 48px;
+    font-size: 42px;
+  }
+
+  .msk-badge {
+    font-family: var(--display);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 3px;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  .msk-badge::before {
+    content: "🕒 ";
+    color: var(--red);
   }
 
   /* DIVIDER */
   .divider {
     width: 100%;
-    max-width: 560px;
+    max-width: 400px;
     margin: 20px auto;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--red), transparent);
     opacity: 0.4;
   }
 
-  /* TRACKLIST SECTION */
-  .tracklist-section {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 0 20px 40px;
-  }
-
-  .section-header {
+  /* BIG LISTEN BUTTON */
+  .listen-btn {
+    display: inline-block;
+    margin: 20px auto 30px;
+    padding: 18px 42px;
+    background: transparent;
+    border: 2px solid var(--red);
+    color: var(--red);
     font-family: var(--display);
-    font-size: 11px;
-    letter-spacing: 7px;
-    color: var(--dim);
+    font-size: 28px;
+    letter-spacing: 8px;
     text-transform: uppercase;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  /* TRACK ROW */
-  .track {
-    display: grid;
-    grid-template-columns: 28px 1fr;
-    gap: 12px;
-    align-items: start;
-    padding: 10px 0;
-    border-bottom: 1px solid #141414;
+    text-decoration: none;
     cursor: pointer;
-    position: relative;
-    transition: background 0.15s;
-    user-select: none;
-  }
-
-  .track:hover {
-    background: rgba(200, 17, 17, 0.04);
-  }
-
-  .track:hover .track-num {
-    color: var(--red);
-  }
-
-  .track.active {
-    background: rgba(200, 17, 17, 0.07);
-  }
-
-  .track.active .track-num {
-    color: var(--red);
-    animation: flicker 1.5s infinite;
-  }
-
-  .track-num {
-    font-family: var(--display);
-    font-size: 20px;
-    color: var(--dim);
-    padding-top: 1px;
-    text-align: right;
-    transition: color 0.15s;
-  }
-
-  .track-info {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .track-title {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--cream);
-    text-transform: lowercase;
-    line-height: 1.4;
-    letter-spacing: 0.5px;
-  }
-
-  .track.active .track-title {
-    color: #fff;
-  }
-
-  .track-prod {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 0.5px;
-  }
-
-  /* PROGRESS BAR */
-  .track-progress-wrap {
-    grid-column: 1 / -1;
-    padding-left: 40px;
-    display: none;
-  }
-
-  .track.active .track-progress-wrap {
-    display: block;
-  }
-
-  .track-progress-bar {
-    height: 1px;
-    background: #1a1a1a;
-    margin-top: 8px;
+    transition: all 0.3s ease;
+    animation: btn-pulse 2s infinite;
     position: relative;
     overflow: hidden;
   }
 
-  .track-progress-fill {
+  .listen-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
     height: 100%;
     background: var(--red);
-    width: 0%;
-    transition: width 0.5s linear;
+    transition: left 0.3s ease;
+    z-index: -1;
   }
 
-  .track-time {
-    font-family: var(--display);
-    font-size: 11px;
-    color: var(--dim);
-    margin-top: 4px;
-    letter-spacing: 2px;
+  .listen-btn:hover {
+    color: var(--black);
+    border-color: var(--red);
   }
 
-  /* PLAY INDICATOR */
-  .play-indicator {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    font-family: var(--display);
-    font-size: 11px;
-    color: var(--dim);
-    letter-spacing: 1px;
-    opacity: 0;
-    transition: opacity 0.2s;
+  .listen-btn:hover::before {
+    left: 0;
   }
 
-  .track:hover .play-indicator {
-    opacity: 1;
-  }
-
-  .track.active .play-indicator {
-    opacity: 1;
-    color: var(--red);
-    animation: flicker 1s infinite;
+  .listen-btn:active {
+    transform: scale(0.98);
   }
 
   /* BOTTOM SECTION */
   .bottom-section {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 10px 20px 60px;
     text-align: center;
+    margin-top: 20px;
   }
 
   .links-row {
@@ -467,50 +392,24 @@
     text-transform: uppercase;
   }
 
-  /* SNIPPET PLAYER LABEL */
-  .snippet-label {
-    font-family: var(--display);
-    font-size: 11px;
-    color: var(--red);
-    letter-spacing: 3px;
-    text-align: center;
-    margin-bottom: 12px;
-    animation: flicker 3s infinite;
-    display: none;
-  }
-
-  .snippet-label.visible { display: block; }
-
-  /* MOSCOW TIME INDICATOR */
-  .msk-badge {
-    font-family: var(--display);
-    font-size: 9px;
-    color: var(--dim);
-    letter-spacing: 3px;
-    margin-top: 8px;
-    text-transform: uppercase;
-  }
-
-  .msk-badge::before {
-    content: "🕒 ";
-    color: var(--red);
-  }
-
   @media (max-width: 500px) {
+    .container { padding: 20px 16px; }
     .links-row { flex-direction: column; align-items: center; }
-    .tg-link { width: 100%; justify-content: center; }
+    .tg-link { width: 80%; justify-content: center; }
+    .listen-btn { font-size: 20px; letter-spacing: 4px; padding: 14px 24px; }
+    .countdown-sep { font-size: 32px; margin-bottom: 8px; }
   }
 </style>
 </head>
 <body>
 
-<div class="header-zone">
+<div class="container">
   <div class="warning-strip">ЭКСКРЕМЕНЦИЯ!!!</div>
 
   <div class="cover-wrap">
     <img class="cover-img" id="coverImg" src="cover.jpg" alt="ЭКСКРЕМЕНТ СИТИ"
          onerror="this.style.display='none'; document.getElementById('coverFallback').style.display='flex';">
-    <div id="coverFallback" style="display:none;width:min(480px,90vw);height:min(480px,90vw);background:#0e0e0e;border:1px solid #1a1a1a;align-items:center;justify-content:center;font-family:var(--display);font-size:48px;color:#1a1a1a;letter-spacing:4px;">💩 COVER 💩</div>
+    <div id="coverFallback" style="display:none;width:min(400px,80vw);height:min(400px,80vw);background:#0e0e0e;border:1px solid #1a1a1a;align-items:center;justify-content:center;font-family:var(--display);font-size:48px;color:#1a1a1a;letter-spacing:4px;margin:0 auto;">💩 COVER 💩</div>
     <span class="cover-corner tl">ЭКСК</span>
     <span class="cover-corner tr">CITY</span>
     <span class="cover-corner bl">2026</span>
@@ -545,170 +444,33 @@
     </div>
     <div class="msk-badge">МОСКВА 00:00</div>
   </div>
-</div>
 
-<div class="divider"></div>
+  <div class="divider"></div>
 
-<div class="tracklist-section">
-  <div class="section-header">— треклист —</div>
+  <!-- БОЛЬШАЯ КНОПКА СЛУШАТЬ -->
+  <a href="https://soundcloud.com/temaprikolov93/sets/ekskrementcity" 
+     class="listen-btn" 
+     target="_blank"
+     rel="noopener noreferrer">
+    🎧 СЛУШАТЬ
+  </a>
 
-  <div class="snippet-label" id="snippetLabel">[ СНИППЕТ 30 СЕК — ЭКСКЛЮЗИВ ]</div>
+  <div class="divider"></div>
 
-  <div id="trackList"></div>
-</div>
-
-<div class="divider"></div>
-
-<div class="bottom-section">
-  <div class="section-header">— вся инфа тут —</div>
-  <div class="links-row">
-    <a class="tg-link" href="https://t.me/temaprikolov2" target="_blank">temaprikolov</a>
-    <a class="tg-link" href="https://t.me/mczloO" target="_blank">MC ZLO</a>
+  <div class="bottom-section">
+    <div class="links-row">
+      <a class="tg-link" href="https://t.me/temaprikolov2" target="_blank" rel="noopener noreferrer">temaprikolov</a>
+      <a class="tg-link" href="https://t.me/mczloO" target="_blank" rel="noopener noreferrer">MC ZLO</a>
+    </div>
+    <div class="footer-line">ЭКСКРЕМЕНТ СИТИ © 2026 / temaprikolov &amp; MC ZLO</div>
   </div>
-  <div class="footer-line">ЭКСКРЕМЕНТ СИТИ © 2026 / temaprikolov &amp; MC ZLO</div>
 </div>
-
-<audio id="player" preload="none"></audio>
 
 <script>
-const TRACKS = [
-  { title: "определение в блатные", feat: "ft. WaWit", prod: "prod. Михаил Круг",       file: "snippets/01.mp3" },
-  { title: "пила 11",               feat: "",          prod: "prod. John Kramer",         file: "snippets/02.mp3" },
-  { title: "каловые мальдивы",      feat: "ft. deyezaxo", prod: "prod. трилпил",         file: "snippets/03.mp3" },
-  { title: "тимофей кулимов",       feat: "",          prod: "prod. DJ KOBILJON",         file: "snippets/04.mp3" },
-  { title: "СКИТ by ИЛЬНАЗ ГАЛЯЛИЕВ", feat: "",        prod: "",                          file: "snippets/05.mp3" },
-  { title: "в любой день недели",   feat: "",          prod: "prod. brosxzmm + beatrat556", file: "snippets/06.mp3" },
-  { title: "каловая фантазия",      feat: "ft. королевский 17 настоящий", prod: "prod. R2R", file: "snippets/07.mp3" },
-  { title: "ЧЕ ЗА СУЕТА? 😈🥀",    feat: "ft. tёmä",  prod: "prod. SUETOLOG",            file: "snippets/08.mp3" },
-  { title: "фетишисткий трек в сторону маши и медведя", feat: "ft. 27theory", prod: "prod. Jeffrey Epstein", file: "snippets/09.mp3" },
-  { title: "МАРИАННА КИС",          feat: "",          prod: "prod. Ilya Meddison",       file: "snippets/10.mp3" },
-];
-
-const SNIPPET_DURATION = 30;
-const player = document.getElementById('player');
-const snippetLabel = document.getElementById('snippetLabel');
-let currentIdx = -1;
-let progressInterval = null;
-
-function buildList() {
-  const container = document.getElementById('trackList');
-  TRACKS.forEach((t, i) => {
-    const row = document.createElement('div');
-    row.className = 'track';
-    row.id = `track-${i}`;
-
-    const titleLine = [t.title, t.feat].filter(Boolean).join(' ');
-    const prodLine = t.prod;
-
-    row.innerHTML = `
-      <div class="track-num">${String(i+1).padStart(2,'0')}</div>
-      <div class="track-info">
-        <div class="track-title">${escapeHtml(titleLine)}</div>
-        ${prodLine ? `<div class="track-prod">${escapeHtml(prodLine)}</div>` : ''}
-      </div>
-      <div class="track-progress-wrap">
-        <div class="track-progress-bar"><div class="track-progress-fill" id="fill-${i}"></div></div>
-        <div class="track-time" id="time-${i}">0:00 / 0:30</div>
-      </div>
-      <span class="play-indicator" id="pi-${i}">▶ PLAY</span>
-    `;
-
-    row.addEventListener('click', () => toggleTrack(i));
-    container.appendChild(row);
-  });
-}
-
-function escapeHtml(str) {
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  });
-}
-
-function toggleTrack(idx) {
-  if (currentIdx === idx) {
-    stopAll();
-    return;
-  }
-  stopAll();
-  playTrack(idx);
-}
-
-function playTrack(idx) {
-  currentIdx = idx;
-  const row = document.getElementById(`track-${idx}`);
-  row.classList.add('active');
-  document.getElementById('coverImg').classList.add('glitching');
-  snippetLabel.classList.add('visible');
-
-  const pi = document.getElementById(`pi-${idx}`);
-  if (pi) pi.textContent = '■ STOP';
-
-  player.src = TRACKS[idx].file;
-  player.currentTime = 0;
-
-  const startPlay = () => {
-    player.play().catch(() => {});
-    startProgress(idx);
-  };
-
-  player.oncanplay = startPlay;
-  player.onerror = () => {
-    startProgress(idx);
-  };
-
-  player.load();
-
-  player.ontimeupdate = () => {
-    if (player.currentTime >= SNIPPET_DURATION) {
-      stopAll();
-    }
-  };
-}
-
-function startProgress(idx) {
-  clearInterval(progressInterval);
-  const fill = document.getElementById(`fill-${idx}`);
-  const time = document.getElementById(`time-${idx}`);
-  const start = Date.now();
-  const dur = SNIPPET_DURATION * 1000;
-
-  progressInterval = setInterval(() => {
-    const elapsed = Math.min(Date.now() - start, dur);
-    const pct = (elapsed / dur) * 100;
-    if (fill) fill.style.width = pct + '%';
-    const secs = Math.floor(elapsed / 1000);
-    if (time) time.textContent = `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')} / 0:30`;
-    if (elapsed >= dur) {
-      clearInterval(progressInterval);
-      stopAll();
-    }
-  }, 100);
-}
-
-function stopAll() {
-  if (currentIdx >= 0) {
-    const row = document.getElementById(`track-${currentIdx}`);
-    if (row) row.classList.remove('active');
-    const pi = document.getElementById(`pi-${currentIdx}`);
-    if (pi) pi.textContent = '▶ PLAY';
-    const fill = document.getElementById(`fill-${currentIdx}`);
-    if (fill) fill.style.width = '0%';
-  }
-  clearInterval(progressInterval);
-  player.pause();
-  player.src = '';
-  currentIdx = -1;
-  document.getElementById('coverImg').classList.remove('glitching');
-  snippetLabel.classList.remove('visible');
-}
-
-// ========== COUNTDOWN — ИСПРАВЛЕНО НА 00:00 МСК ==========
+// ========== COUNTDOWN — 00:00 МСК ==========
 // 20 апреля 2026 года, 00:00 по московскому времени (UTC+3)
 const DROP_DATE = new Date(Date.UTC(2026, 3, 19, 21, 0, 0));
-// Пояснение: 20 апреля 00:00 МСК = 19 апреля 21:00 UTC
+// 20 апреля 00:00 МСК = 19 апреля 21:00 UTC
 
 function updateCountdown() {
   const now = new Date();
@@ -731,7 +493,6 @@ function updateCountdown() {
   document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
 }
 
-buildList();
 updateCountdown();
 setInterval(updateCountdown, 1000);
 </script>

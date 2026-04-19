@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ЭКСКРЕМЕНТ СИТИ — 20.04.26</title>
+<title>ЭКСКРЕМЕНТ СИТИ — 20.04.26 — 00:00 МСК</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -12,6 +12,7 @@
     --dark: #0e0e0e;
     --red: #cc1111;
     --orange: #ff4500;
+    --brown: #8B5A2B;
     --cream: #d8cfc0;
     --dim: #6b6058;
     --mono: 'Share Tech Mono', monospace;
@@ -86,14 +87,12 @@
     100% { color: var(--cream); }
   }
 
-  @keyframes bar-fill {
-    from { width: 0%; }
-    to { width: var(--target-width, 100%); }
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  /* SPECIAL SHIT ANIMATION */
+  @keyframes float-shit {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
   }
 
   /* HEADER ZONE */
@@ -103,7 +102,7 @@
     position: relative;
   }
 
-  .header-zone .warning-strip {
+  .warning-strip {
     font-family: var(--display);
     font-size: 13px;
     letter-spacing: 6px;
@@ -111,6 +110,15 @@
     text-transform: uppercase;
     margin-bottom: 30px;
     animation: flicker 8s infinite;
+  }
+
+  .warning-strip::before {
+    content: "💩 ";
+    letter-spacing: 0;
+  }
+  .warning-strip::after {
+    content: " 💩";
+    letter-spacing: 0;
   }
 
   /* COVER */
@@ -125,7 +133,7 @@
     height: min(480px, 90vw);
     object-fit: cover;
     display: block;
-    filter: contrast(1.1) saturate(0.85);
+    filter: contrast(1.1) saturate(0.85) sepia(0.1);
     border: 1px solid #1a1a1a;
     position: relative;
     z-index: 1;
@@ -244,6 +252,15 @@
     color: var(--red);
     letter-spacing: 6px;
     animation: pulse-red 1.5s infinite;
+  }
+
+  .dropped-msg::before {
+    content: "💩 ";
+    font-size: 48px;
+  }
+  .dropped-msg::after {
+    content: " 💩";
+    font-size: 48px;
   }
 
   /* DIVIDER */
@@ -436,8 +453,8 @@
   }
 
   .tg-link::before {
-    content: '▶';
-    font-size: 9px;
+    content: '💩';
+    font-size: 11px;
     color: var(--red);
   }
 
@@ -448,17 +465,6 @@
     letter-spacing: 5px;
     color: #2a2a2a;
     text-transform: uppercase;
-  }
-
-  /* AUDIO NOTICE */
-  .no-audio-note {
-    display: none;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 1px;
-    margin-top: 6px;
-    opacity: 0.6;
   }
 
   /* SNIPPET PLAYER LABEL */
@@ -475,6 +481,21 @@
 
   .snippet-label.visible { display: block; }
 
+  /* MOSCOW TIME INDICATOR */
+  .msk-badge {
+    font-family: var(--display);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 3px;
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  .msk-badge::before {
+    content: "🕒 ";
+    color: var(--red);
+  }
+
   @media (max-width: 500px) {
     .links-row { flex-direction: column; align-items: center; }
     .tg-link { width: 100%; justify-content: center; }
@@ -489,7 +510,7 @@
   <div class="cover-wrap">
     <img class="cover-img" id="coverImg" src="cover.jpg" alt="ЭКСКРЕМЕНТ СИТИ"
          onerror="this.style.display='none'; document.getElementById('coverFallback').style.display='flex';">
-    <div id="coverFallback" style="display:none;width:min(480px,90vw);height:min(480px,90vw);background:#0e0e0e;border:1px solid #1a1a1a;align-items:center;justify-content:center;font-family:var(--display);font-size:48px;color:#1a1a1a;letter-spacing:4px;">COVER</div>
+    <div id="coverFallback" style="display:none;width:min(480px,90vw);height:min(480px,90vw);background:#0e0e0e;border:1px solid #1a1a1a;align-items:center;justify-content:center;font-family:var(--display);font-size:48px;color:#1a1a1a;letter-spacing:4px;">💩 COVER 💩</div>
     <span class="cover-corner tl">ЭКСК</span>
     <span class="cover-corner tr">CITY</span>
     <span class="cover-corner bl">2026</span>
@@ -522,6 +543,7 @@
         <span class="countdown-label">секунд</span>
       </div>
     </div>
+    <div class="msk-badge">МОСКВА 00:00</div>
   </div>
 </div>
 
@@ -530,7 +552,7 @@
 <div class="tracklist-section">
   <div class="section-header">— треклист —</div>
 
-  <div class="snippet-label" id="snippetLabel">[ ЭТ СНИППЕТ ]</div>
+  <div class="snippet-label" id="snippetLabel">[ СНИППЕТ 30 СЕК — ЭКСКЛЮЗИВ ]</div>
 
   <div id="trackList"></div>
 </div>
@@ -581,8 +603,8 @@ function buildList() {
     row.innerHTML = `
       <div class="track-num">${String(i+1).padStart(2,'0')}</div>
       <div class="track-info">
-        <div class="track-title">${titleLine}</div>
-        ${prodLine ? `<div class="track-prod">${prodLine}</div>` : ''}
+        <div class="track-title">${escapeHtml(titleLine)}</div>
+        ${prodLine ? `<div class="track-prod">${escapeHtml(prodLine)}</div>` : ''}
       </div>
       <div class="track-progress-wrap">
         <div class="track-progress-bar"><div class="track-progress-fill" id="fill-${i}"></div></div>
@@ -593,6 +615,15 @@ function buildList() {
 
     row.addEventListener('click', () => toggleTrack(i));
     container.appendChild(row);
+  });
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
   });
 }
 
@@ -625,13 +656,11 @@ function playTrack(idx) {
 
   player.oncanplay = startPlay;
   player.onerror = () => {
-    // No audio file — still show visual feedback
     startProgress(idx);
   };
 
   player.load();
 
-  // Hard cutoff at 30s
   player.ontimeupdate = () => {
     if (player.currentTime >= SNIPPET_DURATION) {
       stopAll();
@@ -676,15 +705,18 @@ function stopAll() {
   snippetLabel.classList.remove('visible');
 }
 
-// COUNTDOWN
-const DROP_DATE = new Date('2026-04-20T00:00:00');
+// ========== COUNTDOWN — ИСПРАВЛЕНО НА 00:00 МСК ==========
+// 20 апреля 2026 года, 00:00 по московскому времени (UTC+3)
+const DROP_DATE = new Date(Date.UTC(2026, 3, 19, 21, 0, 0));
+// Пояснение: 20 апреля 00:00 МСК = 19 апреля 21:00 UTC
 
 function updateCountdown() {
   const now = new Date();
   const diff = DROP_DATE - now;
 
   if (diff <= 0) {
-    document.getElementById('countdown').innerHTML = '<div class="dropped-msg">УЖЕ ВЫШЕЛ</div>';
+    const countdownEl = document.getElementById('countdown');
+    countdownEl.innerHTML = '<div class="dropped-msg">УЖЕ ВЫШЕЛ</div>';
     return;
   }
 
